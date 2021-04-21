@@ -1,0 +1,21 @@
+let purchasedServers = 0;
+
+export async function main(ns) {
+    var ram = ns.args[0];
+    var target = ns.args[1];
+    
+    // This is based on the dynamic ram usage checker, will automate later
+    var ramCost = 3;
+    var threads = Math.round(ram / ramCost);
+    
+    while (purchasedServers < ns.getPurchasedServerLimit()) {
+        if (ns.getServerMoneyAvailable("home") > ns.getPurchasedServerCost(ram)) {
+            var hostname = "pserv-" + purchasedServers;
+            ns.purchaseServer(hostname, ram);
+            ns.scp("/scripts/auto-hack.ns", hostname);
+            ns.exec("/scripts/auto-hack.ns", hostname, threads, target);
+            ++purchasedServers;
+        }
+        await ns.sleep(1000);
+    }
+}
